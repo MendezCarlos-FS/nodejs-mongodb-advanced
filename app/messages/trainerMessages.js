@@ -6,5 +6,4 @@ module.exports = {
     trainer_delete_success: "Successfully deleted trainer",
     trainer_not_found: "Could not find trainer",
     trainer_duplicate_entry: "This trainer already exists.",
-
 };
