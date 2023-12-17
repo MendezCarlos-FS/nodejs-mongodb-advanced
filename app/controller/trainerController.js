@@ -49,8 +49,14 @@ const getTrainerByName = async (req, res) => {
 const createTrainer = async (req, res) => {
     const {trainer} = req.body;
     try {
-        const newTrainer = await Trainers.create(trainer);
-        console.log(newTrainer);
+        // Awaits the creation, then populates the pokemonList field.
+        const newTrainer = await(await Trainers.create(trainer))
+        .populate("pokemonList", "name level abilities shiny");
+        if (newTrainer) {
+            // Takes the virutal values that were populated in pokemonList and puts them in ownedPokemon array
+            newTrainer.ownedPokemon = newTrainer.pokemonList.map(pokemon => pokemon);
+        }
+
         // 201 indicates successful creation
         res.status(201).json({
             trainer: newTrainer,
@@ -82,7 +88,13 @@ const createTrainer = async (req, res) => {
 const updateTrainer = async (req, res) => {
     try {
         const name = req.params.id;
-        const trainer = await Trainers.findOneAndUpdate({name}, req.body, {new:true, runValidators:true});
+        const trainer = await Trainers.findOneAndUpdate({name}, req.body, {new:true, runValidators:true})
+        .populate("pokemonList", "name level abilities shiny")
+        .select("name age ownedPokemon");
+        if (trainer) {
+            // Takes the virutal values that were populated in pokemonList and puts them in ownedPokemon array
+            trainer.ownedPokemon = trainer.pokemonList.map(pokemon => pokemon);
+        }
 
         const statusCode = trainer ? 200 : 404;
         const message = statusCode === 200 ? trainer_update_success : trainer_not_found;
@@ -105,7 +117,13 @@ const updateTrainer = async (req, res) => {
 const deleteTrainer = async (req, res) => {
     try {
         const name = req.params.id;
-        const trainer = await Trainers.findOneAndDelete({name: name});
+        const trainer = await Trainers.findOneAndDelete({name: name})
+        .populate("pokemonList", "name level abilities shiny")
+        .select("name age ownedPokemon");
+        if (trainer) {
+            // Takes the virutal values that were populated in pokemonList and puts them in ownedPokemon array
+            trainer.ownedPokemon = trainer.pokemonList.map(pokemon => pokemon);
+        }
 
         const statusCode = trainer ? 200 : 404;
         const message = statusCode === 200 ? trainer_delete_success : trainer_not_found;
