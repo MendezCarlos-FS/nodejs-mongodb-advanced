@@ -8,7 +8,7 @@ const trainerSchema = new mongoose.Schema({
         unique: [true, "You can only have one trainer of that name."],
     },
     age: Number,
-    ownedPokemon: [{}]
+    ownedPokemon: [Object]
 });
 
 trainerSchema.virtual("pokemonList", {
